@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta tags for SEO -->
+    <title>Ye Olde Guestbook</title>
+    <meta name="description" content="A retro, old-school digital guestbook. Leave a message for posterity!">
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load retro font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom old-school styles */
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #f5f5dc; /* Parchment / Beige */
+            color: #4a2c2a; /* Dark brown */
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.5;
+        }
+        
+        /* 90s-style outset/inset borders for a 3D feel */
+        .retro-box {
+            background-color: #e0dac0; /* A slightly darker beige */
+            border: 4px outset #bdbab0;
+            border-radius: 0;
+            padding: 1.5rem;
+        }
+
+        .retro-input,
+        .retro-textarea {
+            border: 2px inset #bdbab0;
+            background-color: #fafaeb;
+            padding: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            width: 100%;
+            color: #333;
+        }
+        
+        .retro-input:focus,
+        .retro-textarea:focus {
+            outline: 2px solid #4a2c2a;
+        }
+
+        .retro-button {
+            border: 3px outset #bdbab0;
+            background-color: #c0bca5;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #4a2c2a;
+            font-size: 1.125rem;
+        }
+        
+        .retro-button:active {
+            border-style: inset;
+            background-color: #b0ad9a;
+        }
+        
+        /* Dashed divider for entries */
+        .entry {
+            border-bottom: 2px dashed #a05a2f; /* A coppery brown */
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .entry-header {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #6a3a3a; /* Darker red-brown */
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .entry-timestamp {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: #5e5e5e;
+        }
+        
+        .entry-message {
+            margin-top: 0.5rem;
+            white-space: pre-wrap; /* Preserves line breaks from textarea */
+            word-wrap: break-word; /* Prevents long words from overflowing */
+        }
+
+        /* Loading/Error Message Box */
+        #message-box {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem;
+            background-color: #4a2c2a;
+            color: #f5f5dc;
+            border: 4px outset #bdbab0;
+            z-index: 100;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-2xl mx-auto">
+        
+        <!-- Main Guestbook Box -->
+        <div class="retro-box">
+            <h1 class="text-4xl font-bold text-center mb-6 text-shadow">
+                ~~ Ye Olde Guestbook ~~
+            </h1>
+    
+            <!-- Form for new entries -->
+            <form id="guestbook-form" class="mb-8">
+                <div class="mb-4">
+                    <label for="name" class="block mb-2 text-lg">Your Name:</label>
+                    <input type="text" id="name" class="retro-input" required maxlength="50">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="message" class="block mb-2 text-lg">Your Message:</label>
+                    <textarea id="message" rows="4" class="retro-textarea" required maxlength="500"></textarea>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="retro-button">
+                        Sign the Book!
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Divider -->
+            <hr class="border-2 border-dashed border-[#a05a2f] my-8">
+            
+            <!-- Display area for entries -->
+            <h2 class="text-3xl font-bold text-center mb-6">What Folks Have Said:</h2>
+            <div id="entries-container">
+                <p class="text-center">Loading entries...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Message box for errors/loading -->
+    <div id="message-box"></div>
+
+    <!-- Firebase and app logic -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            query, 
+            serverTimestamp,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // --- Firebase Config: PLACEHOLDER ---
+        // PASTE YOUR CONFIG OBJECT FROM THE FIREBASE CONSOLE HERE
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_PROJECT_ID.appspot.com",
+          messagingSenderId: "YOUR_SENDER_ID",
+          appId: "YOUR_APP_ID",
+          measurementId: "YOUR_MEASUREMENT_ID"
+        };
+        // --- END OF PLACEHOLDER ---
+
+
+        // --- Global Variables ---
+        let db, auth, userId;
+        // This is the collection your app will use.
+        // It's defined in the Firestore Rules.
+        const GUESTBOOK_COLLECTION_PATH = `guestbookEntries`;
+
+        // --- UI Elements ---
+        const guestbookForm = document.getElementById('guestbook-form');
+        const nameInput = document.getElementById('name');
+        const messageInput = document.getElementById('message');
+        const entriesContainer = document.getElementById('entries-container');
+        const messageBox = document.getElementById('message-box');
+        
+        // --- Helper Functions ---
+        
+        /**
+         * Shows a message in the message box.
+         * @param {string} text - The message to display.
+         * @param {number} [duration=3000] - How long to show the message (in ms).
+         */
+        function showMessage(text, duration = 3000) {
+            messageBox.textContent = text;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, duration);
+        }
+
+        /**
+         * Formats a Firestore timestamp into a readable string.
+         * @param {object} timestamp - Firestore timestamp object (or null).
+         * @returns {string} - Formatted date/time string.
+         */
+        function formatTimestamp(timestamp) {
+            if (timestamp && timestamp.seconds) {
+                return new Date(timestamp.seconds * 1000).toLocaleString();
+            }
+            return 'Just now';
+        }
+
+        // --- Core Functions ---
+
+        /**
+         * Adds a new entry to the Firestore guestbook.
+         * @param {Event} e - The form submit event.
+         */
+        async function addEntry(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            if (!db || !userId) {
+                showMessage("Not connected to database. Please wait.");
+                return;
+            }
+
+            const name = nameInput.value.trim();
+            const message = messageInput.value.trim();
+
+            if (!name || !message) {
+                showMessage("Please fill out both name and message!");
+                return;
+            }
+
+            try {
+                console.log("Attempting to add entry for user:", userId);
+                const guestbookCollection = collection(db, GUESTBOOK_COLLECTION_PATH);
+                await addDoc(guestbookCollection, {
+                    name: name,
+                    message: message,
+                    timestamp: serverTimestamp(),
+                    ownerId: userId // Store who made the post
+                });
+                
+                // Clear the form
+                nameInput.value = '';
+                messageInput.value = '';
+                showMessage("Entry added!", 2000);
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                // Check for a specific permission error
+                if (error.code === 'permission-denied') {
+                    console.log("Firestore permissions error. This usually means you need to update your Firestore Rules in the Firebase console.");
+                    showMessage("Error: Insufficient permissions.");
+                } else {
+                    showMessage("Error: Could not add entry.");
+                }
+            }
+        }
+
+        /**
+         * Loads guestbook entries from Firestore and displays them.
+         */
+        function loadGuestbook() {
+            if (!db) {
+                entriesContainer.innerHTML = '<p class="text-center">Error: Database not initialized.</p>';
+                return;
+            }
+
+            const q = query(collection(db, GUESTBOOK_COLLECTION_PATH));
+            
+            onSnapshot(q, (querySnapshot) => {
+                entriesContainer.innerHTML = ''; // Clear current entries
+                
+                if (querySnapshot.empty) {
+                    entriesContainer.innerHTML = '<p class="text-center">Be the first to sign!</p>';
+                    return;
+                }
+
+                // Get docs and sort them client-side by timestamp (newest first)
+                const entries = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                // Sort by timestamp, handling potential nulls
+                entries.sort((a, b) => {
+                    const timeA = a.timestamp ? a.timestamp.seconds : 0;
+                    const timeB = b.timestamp ? b.timestamp.seconds : 0;
+                    return timeB - timeA; // Descending order
+                });
+
+                // Render sorted entries
+                entries.forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.className = 'entry';
+
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'entry-header';
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = entry.name;
+                    
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'entry-timestamp';
+                    timeSpan.textContent = formatTimestamp(entry.timestamp);
+                    
+                    headerDiv.appendChild(nameSpan);
+                    headerDiv.appendChild(timeSpan);
+
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'entry-message';
+                    // Use textContent to prevent HTML injection
+                    messageDiv.textContent = entry.message; 
+                    
+                    entryDiv.appendChild(headerDiv);
+                    entryDiv.appendChild(messageDiv);
+                    
+                    entriesContainer.appendChild(entryDiv);
+                });
+
+            }, (error) => {
+                console.error("Error loading guestbook: ", error);
+                // Be more specific in the console and UI
+                if (error.code === 'permission-denied') {
+                    console.log("Firestore permissions error. This usually means you need to update your Firestore Rules in the Firebase console.");
+                    entriesContainer.innerHTML = '<p class="text-center">Error loading entries. (Permissions Error)</p>';
+                } else {
+                    entriesContainer.innerHTML = '<p class="text-center">Error loading entries. Check console.</p>';
+                }
+                showMessage("Error loading guestbook.");
+            });
+        }
+
+        /**
+         * Initializes the Firebase app and sets up auth/listeners.
+         */
+        async function initialize() {
+             // Check if the config is just a placeholder
+            if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                const errorMsg = "FATAL ERROR: Firebase config is just a placeholder. You must paste your real firebaseConfig object into guestbook-template.html.";
+                console.error(errorMsg);
+                entriesContainer.innerHTML = `<p class="text-center text-red-500 font-bold">${errorMsg}</p>`;
+                return;
+            }
+            
+            try {
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Enable debug logging for Firestore
+                setLogLevel('Debug');
+
+                // Set up auth state listener
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // User is signed in
+                        userId = user.uid;
+                        console.log("User signed in with UID:", userId);
+                        console.log("Authentication complete. Now attempting to load guestbook from:", GUESTBOOK_COLLECTION_PATH);
+                        // Once auth is ready, load the guestbook
+                        loadGuestbook();
+                    } else {
+                        // User is signed out, attempt to sign in anonymously
+                        try {
+                            console.log("Signing in anonymously...");
+                            await signInAnonymously(auth);
+                        } catch (authError) {
+                            console.error("Auth Error: ", authError);
+                            console.log("This might be a problem with your Firebase project setup, network, or auth settings in the Firebase console.");
+                            showMessage("Error: Could not authenticate.");
+                        }
+                    }
+                });
+
+                // Attach form submit listener
+                guestbookForm.addEventListener('submit', addEntry);
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                entriesContainer.innerHTML = '<p class="text-center">Fatal Error: Could not initialize app. Check console.</p>';
+            }
+        }
+
+        // --- Start the app ---
+        initialize();
+
+    </script>
+</body>
+</html>
