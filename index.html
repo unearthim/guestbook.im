@@ -3,40 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- === 1. Primary Meta Tags === -->
-    <title>The Guestbook Monument | guestbook.im</title>
-    <meta name="title" content="The Guestbook Monument | guestbook.im">
+    <title>The Guestbook Monument</title>
     <meta name="description" content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.">
-    <meta name="keywords" content="guestbook, web 1.0, digital monument, retro web, web tutorial, firebase, unearth.im, hand-built web">
-    <meta name="author" content="guestbook.im (An unearth.im Project)">
-    <meta name="robots" content="index, follow">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="language" content="English">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://guestbook.im/" />
- 
-    <!-- === 2. Webmention Endpoint === -->
-    <link rel="webmention" href="https://webmention.io/unearth.im/webmention" />
-
-    <!-- === 3. Open Graph / Facebook === -->
-    <meta property="og:type" content="website"> 
-    <meta property="og:url" content="https://guestbook.im/">
-    <meta property="og:title" content="The Guestbook Monument | guestbook.im">
-    <meta property="og:description" content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.">
-    <meta property="og:image" content="https://guestbook.im/og-image.png">
-    <meta property="og:site_name" content="guestbook.im">
-
-    <!-- === 4. Twitter Card === -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://guestbook.im/">
-    <meta property="twitter:title" content="The Guestbook Monument | guestbook.im">
-    <meta property="twitter:description" content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.">
-    <meta property="twitter:image" content="https://guestbook.im/og-image.png">
-
-    <!-- === 5. Favicons === -->
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -468,18 +436,11 @@ service cloud.firestore {
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Global Variables ---
-        // These are provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
+        // --- Global Variables (will be set in init) ---
         let db, auth, userId;
-        const GUESTBOOK_COLLECTION_PATH = `/artifacts/${appId}/public/data/guestbookEntries`;
-
-        // --- UI Elements (will be found when initGuestbookApp runs) ---
         let guestbookForm, nameInput, messageInput, entriesContainer, messageBox;
-        
+        let GUESTBOOK_COLLECTION_PATH; // Will be set in init
+
         // --- Helper Functions ---
         
         /**
@@ -623,14 +584,23 @@ service cloud.firestore {
          * This function is now exposed on the window and called by the nav script.
          */
         window.initGuestbookApp = async function() {
-            // 1. Get references to all the UI elements
+            // 1. READ ENV VARIABLES (NOW)
+            // These are provided by the Canvas environment
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfigJSON = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            
+            // Set the dynamic collection path
+            GUESTBOOK_COLLECTION_PATH = `/artifacts/${appId}/public/data/guestbookEntries`;
+
+            // 2. Get references to all the UI elements
             guestbookForm = document.getElementById('guestbook-form');
             nameInput = document.getElementById('name');
             messageInput = document.getElementById('message');
             entriesContainer = document.getElementById('entries-container');
             messageBox = document.getElementById('message-box');
 
-            // 2. Check if elements exist (in case of error)
+            // 3. Check if elements exist (in case of error)
             if (!guestbookForm || !entriesContainer || !messageBox) {
                 console.error("Guestbook HTML elements not found!");
                 if (entriesContainer) {
@@ -639,14 +609,21 @@ service cloud.firestore {
                 return;
             }
             
-            // 3. Check for Firebase config
-            if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
-                entriesContainer.innerHTML = '<p class="text-center">Error: Firebase config is missing.</p>';
+            // 4. Check for Firebase config
+            let firebaseConfig;
+            try {
+                firebaseConfig = JSON.parse(firebaseConfigJSON);
+                if (Object.keys(firebaseConfig).length === 0) {
+                    throw new Error("Parsed config is empty.");
+                }
+            } catch (e) {
+                console.error("Failed to parse Firebase config:", e);
+                entriesContainer.innerHTML = '<p class="text-center">Error: Firebase config is missing or invalid.</p>';
                 return;
             }
 
             try {
-                // Initialize Firebase
+                // 5. Initialize Firebase
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -654,7 +631,7 @@ service cloud.firestore {
                 // Enable debug logging for Firestore
                 setLogLevel('Debug');
 
-                // Set up auth state listener
+                // 6. Set up auth state listener
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         // User is signed in
@@ -679,7 +656,7 @@ service cloud.firestore {
                     }
                 });
 
-                // Attach form submit listener
+                // 7. Attach form submit listener
                 guestbookForm.addEventListener('submit', addEntry);
 
             } catch (error) {
