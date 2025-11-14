@@ -204,11 +204,11 @@
     </div>
 
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+   <script type="module">
+        // Import Firebase modules (Updated to v12.5.0)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
         import { 
             getFirestore, 
             collection, 
@@ -217,28 +217,28 @@
             onSnapshot, 
             serverTimestamp,
             setLogLevel
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
         // --- CONFIG & INITIALIZATION ---
         
-        // Gemini Proxy URL
+        // *** THIS IS YOUR SECURE GEMINI PROXY URL ***
         const GEMINI_PROXY_URL = 'https://generatecontentproxy-ce7zb66hpq-uc.a.run.app';
 
-        // Firebase Config (using __firebase_config global variable)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config)
-            : {
-                // Fallback config for local testing if needed
-                apiKey: "YOUR_FALLBACK_API_KEY",
-                authDomain: "YOUR_FALLBACK_AUTH_DOMAIN",
-                projectId: "YOUR_FALLBACK_PROJECT_ID",
-                // ... other fallback properties
-            };
+        // *** YOUR REAL FIREBASE CONFIG (from your snippet) ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEU3QcCzu4ZmwJpHhogu1hMpyRp2swUz8",
+            authDomain: "jojo-4b593.firebaseapp.com",
+            projectId: "jojo-4b593",
+            storageBucket: "jojo-4b593.firebasestorage.app",
+            messagingSenderId: "353107431611",
+            appId: "1:353107431611:web:535175b216df8bc644599e",
+            measurementId: "G-326975SXFX"
+        };
         
-        // App ID (using __app_id global variable)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-guestbook-app';
+        // We get the appId from the config object now
+        const appId = firebaseConfig.appId;
         
-        let app, auth, db;
+        let app, auth, db, analytics;
         let currentUserId = null;
         let echoesCollectionPath = '';
         let echoesRef = null;
@@ -249,7 +249,7 @@
 
         // DOM Elements
         const appContainer = document.getElementById('app-container');
-        const fragmentContainer = document.getElementById('fragment-container');
+        const wispContainer = document.getElementById('wisp-container');
         const tooltip = document.getElementById('tooltip');
         const modal = document.getElementById('entry-modal');
         const modalContent = document.getElementById('modal-content');
@@ -258,16 +258,16 @@
         const echoTextarea = document.getElementById('echo-textarea');
         const userIdDisplay = document.getElementById('user-id-display');
         const messageBox = document.getElementById('message-box');
-        const curatorNoteModal = document.getElementById('curator-note-modal');
-        const openCuratorNoteBtn = document.getElementById('open-curator-note');
-        const closeCuratorNoteBtn = document.getElementById('close-curator-note');
+        const artistStatementModal = document.getElementById('artist-statement-modal');
+        const openArtistStatementBtn = document.getElementById('open-artist-statement');
+        const closeArtistStatementBtn = document.getElementById('close-artist-statement');
 
 
         // --- FUNCTIONS ---
 
-        /**
-         * Shows a message to the user (e.g., for errors)
-         */
+/**
+ * Shows a message to the user (e.g., for errors)
+ */
         function showMessage(message, isError = true) {
             console.log(isError ? "Error:" : "Success:", message);
             messageBox.textContent = message;
@@ -283,9 +283,8 @@
          * Calls the Gemini proxy to generate a title
          */
         async function generateTitle(echoText) {
-            // Updated prompt to match the unearth.im lexicon
-            const systemPrompt = `You are the Digital Archivist for unearth.im. A visitor has left a fragment in the guestbook. Your task is to give this fragment a short, academic-sounding title (4 words max) for the archive entry. Do not add quotes.
-Visitor's Fragment: "${echoText}"
+            const systemPrompt = `You are the Curator of Avalon, a digital monument. A traveler has left an echo. Your task is to give this echo a short, mythical-sounding title (4 words max) that captures its essence. Do not add quotes.
+Traveler's Echo: "${echoText}"
 Title:`;
 
             console.log("Calling Gemini Proxy at:", GEMINI_PROXY_URL);
@@ -306,57 +305,54 @@ Title:`;
                 const data = await response.json();
                 console.log("Gemini Response:", data);
                 const title = data.text.replace(/"/g, '').trim();
-                return title || "An Archived Fragment";
+                return title || "An Echo in the Mist";
 
             } catch (error) {
                 console.error("Failed to fetch from Gemini proxy:", error);
-                // Fallback title aligned with our lexicon
-                return "An Archived Fragment";
+                return "An Echo in the Mist";
             }
         }
 
         /**
-         * Renders a single fragment on the screen.
+         * Renders a single echo (wisp) on the screen.
          */
         function renderEcho(doc) {
             try {
                 const data = doc.data();
                 if (data.x === undefined || data.y === undefined) return;
 
-                const fragment = document.createElement('div');
-                // Updated to use the unearth.im primary accent color
-                fragment.className = 'absolute w-2.5 h-2.5 bg-[#A95C3D]/70 rounded-full shadow-lg animate-subtle-pulse cursor-pointer transform -translate-x-1/2 -translate-y-1/2';
-                fragment.style.left = `${data.x}px`;
-                fragment.style.top = `${data.y}px`;
+                const wisp = document.createElement('div');
+                wisp.className = 'absolute w-2.5 h-2.5 bg-cyan-300/70 rounded-full shadow-lg animate-subtle-pulse cursor-pointer transform -translate-x-1/2 -translate-y-1/2';
+                wisp.style.left = `${data.x}px`;
+                wisp.style.top = `${data.y}px`;
                 
-                fragment.dataset.message = data.message || "An empty fragment.";
-                fragment.dataset.title = data.title || "An Archived Fragment"; 
-                fragment.dataset.author = data.userId ? data.userId.substring(0, 6) : 'unknown';
+                wisp.dataset.message = data.message || "An empty echo.";
+                wisp.dataset.title = data.title || "An Echo in the Mist"; 
+                wisp.dataset.author = data.userId ? data.userId.substring(0, 6) : 'unknown';
 
-                fragment.addEventListener('mouseenter', showTooltip);
-                fragment.addEventListener('mouseleave', hideTooltip);
-                fragment.addEventListener('click', (e) => e.stopPropagation());
+                wisp.addEventListener('mouseenter', showTooltip);
+                wisp.addEventListener('mouseleave', hideTooltip);
+                wisp.addEventListener('click', (e) => e.stopPropagation());
 
-                fragmentContainer.appendChild(fragment);
+                wispContainer.appendChild(wisp);
             } catch (error) {
-                console.error("Error rendering fragment:", error);
+                console.error("Error rendering wisp:", error);
             }
         }
 
         /**
-         * Shows the tooltip on fragment hover.
+         * Shows the tooltip on wisp hover.
          */
         function showTooltip(event) {
-            const fragment = event.target;
-            const message = fragment.dataset.message;
-            const author = fragment.dataset.author;
-            const title = fragment.dataset.title;
+            const wisp = event.target;
+            const message = wisp.dataset.message;
+            const author = wisp.dataset.author;
+            const title = wisp.dataset.title;
 
-            // Styled with unearth.im fonts and colors
             tooltip.innerHTML = `
-                <p class="font-serif text-lg font-bold text-[#A95C3D]">${title}</p>
+                <p class="font-serif text-lg font-bold text-cyan-900">${title}</p>
                 <p class="font-serif text-base italic my-2">"${message}"</p>
-                <p class="font-sans text-xs text-gray-500 mt-2 text-right">- Scribe ${author}</p>
+                <p class="text-xs text-gray-500 mt-2 text-right">- Traveler ${author}</p>
             `;
             
             tooltip.style.left = `${event.clientX + 15}px`;
@@ -373,11 +369,10 @@ Title:`;
         }
 
         /**
-         * Opens the modal to leave a fragment.
+         * Opens the modal to leave an echo.
          */
         function openModal(e) {
-            // Prevent modal from opening if clicking on a fragment or the modal content itself
-            if (e.target.closest('#modal-content') || e.target.closest('#fragment-container div')) {
+            if (e.target.closest('#modal-content') || e.target.closest('#wisp-container div')) {
                 return;
             }
             const rect = appContainer.getBoundingClientRect();
@@ -390,35 +385,33 @@ Title:`;
         }
 
         /**
-         * Closes the fragment modal.
+         * Closes the echo modal.
          */
         function closeModal() {
             modal.classList.add('hidden');
         }
 
         /**
-         * Submits the new fragment to Firestore.
+         * Submits the new echo to Firestore.
          */
         async function submitEcho() {
             const message = echoTextarea.value.trim();
             
             if (!message) {
-                showMessage("Your fragment cannot be empty.", true);
+                showMessage("Your echo cannot be empty.", true);
                 return;
             }
             if (!currentUserId || !echoesRef) {
-                showMessage("Not connected to the archive. Please try again.", true);
+                showMessage("Not connected. Please try again.", true);
                 return;
             }
 
             submitEchoBtn.disabled = true;
-            submitEchoBtn.textContent = 'Archiving...';
+            submitEchoBtn.textContent = 'Curating...';
 
             try {
-                // Generate the title using our new prompt
                 const generatedTitle = await generateTitle(message);
 
-                // Save to the public collection
                 await addDoc(echoesRef, {
                     x: tempCoords.x,
                     y: tempCoords.y,
@@ -429,19 +422,19 @@ Title:`;
                 });
                 
                 closeModal();
-                showMessage("Your fragment has been archived.", false);
+                showMessage("Your echo has been curated.", false);
 
             } catch (error) {
                 console.error("Error adding document: ", error);
-                showMessage("Could not archive your fragment. Please try again.", true);
+                showMessage("Could not leave your echo. Please try again.", true);
             } finally {
                 submitEchoBtn.disabled = false;
-                submitEchoBtn.textContent = 'Inscribe Entry';
+                submitEchoBtn.textContent = 'Leave Mark';
             }
         }
 
         /**
-         * Attaches the real-time listener for fragments.
+         * Attaches the real-time listener for echoes.
          */
         function attachEchoesListener() {
             if (!echoesRef) return;
@@ -450,14 +443,13 @@ Title:`;
                 unsubscribeEchoes();
             }
 
-            // Listen for changes in the collection
             const q = query(echoesRef);
             unsubscribeEchoes = onSnapshot(q, (snapshot) => {
-                fragmentContainer.innerHTML = ''; // Clear existing fragments
-                snapshot.forEach(renderEcho); // Render all fragments from snapshot
+                wispContainer.innerHTML = '';
+                snapshot.forEach(renderEcho);
             }, (error) => {
                 console.error("Error with snapshot listener: ", error);
-                showMessage("Lost connection to the archive...", true);
+                showMessage("Lost connection to the echoes...", true);
             });
         }
 
@@ -466,9 +458,8 @@ Title:`;
          * Main function to initialize the app
          */
         async function main() {
-            if (!firebaseConfig || !firebaseConfig.apiKey) {
-                showMessage("Firebase configuration is missing. This application cannot run.", true);
-                console.error("Firebase config is missing. Ensure __firebase_config is populated.");
+            if (!firebaseConfig.apiKey) {
+                showMessage("Firebase configuration is missing. This is unexpected.", true);
                 return;
             }
 
@@ -477,36 +468,32 @@ Title:`;
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+                analytics = getAnalytics(app); // Initialize Analytics
                 setLogLevel('debug'); 
 
-                // Use the public firestore path as per our security rules
-                echoesCollectionPath = `/artifacts/${appId}/public/data/guestbook-fragments`;
+                // *** THIS IS THE CRITICAL FIX ***
+                // Instead of the complex "artifacts" path, we'll use a simple root collection.
+                echoesCollectionPath = `guestbook-echoes`;
                 echoesRef = collection(db, echoesCollectionPath);
                 
                 // Listen for Auth state changes
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUserId = user.uid;
-                        userIdDisplay.textContent = `Scribe ID: ${currentUserId}`;
-                        // Once authenticated, attach the listener
+                        userIdDisplay.textContent = `Traveler ID: ${currentUserId}`;
                         attachEchoesListener();
                     } else {
                         currentUserId = null;
                         userIdDisplay.textContent = 'Connecting...';
-                        if (unsubscribeEchoes) {
+                        if ( unsubscribeEchoes) {
                             unsubscribeEchoes(); 
                         }
                     }
                 });
 
-                // Sign in using the provided token or fall back to anonymous
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token.");
-                } else {
-                    await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
-                }
+                // Sign in anonymously for this public app
+                await signInAnonymously(auth);
+                console.log("Signed in anonymously.");
 
 
                 // --- GLOBAL EVENT LISTENERS ---
@@ -521,24 +508,24 @@ Title:`;
                 
                 submitEchoBtn.addEventListener('click', submitEcho);
 
-                openCuratorNoteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent the main container click
-                    curatorNoteModal.classList.remove('hidden');
+                openArtistStatementBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    artistStatementModal.classList.remove('hidden');
                 });
 
-                closeCuratorNoteBtn.addEventListener('click', () => {
-                    curatorNoteModal.classList.add('hidden');
+                closeArtistStatementBtn.addEventListener('click', () => {
+                    artistStatementModal.classList.add('hidden');
                 });
 
-                curatorNoteModal.addEventListener('click', (e) => {
-                    if (e.target === curatorNoteModal) {
-                        curatorNoteModal.classList.add('hidden');
+                artistStatementModal.addEventListener('click', (e) => {
+                    if (e.target === artistStatementModal) {
+                        artistStatementModal.classList.add('hidden');
                     }
                 });
 
             } catch (error) {
                 console.error("Firebase Initialization Error:", error);
-                showMessage("Failed to initialize the archive. Check console.", true);
+                showMessage("Failed to initialize the art space. Check console.", true);
             }
         }
 
