@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1200" height="630" fill="#f5f5dc"/>
+    
+    <!-- Native SVG Text Elements for better compatibility -->
+    <!-- Note: For Inkscape to render this perfectly, you may need to install the 'VT323' font on your system. -->
+    <text x="600" y="280" font-family="'VT323', monospace" font-size="96" font-weight="bold" fill="#4a2c2a" text-anchor="middle">
+        The Guestbook
+    </text>
+    <text x="600" y="340" font-family="'VT323', monospace" font-size="36" fill="#4a2c2a" text-anchor="middle">
+        A digital monument to the hand-built web.
+    </text>
+    <text x="600" y="420" font-family="'VT323', monospace" font-size="28" fill="#6a3a3a" text-anchor="middle">
+        guestbook.im
+    </text>
+</svg>

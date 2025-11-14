@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background with outset border effect -->
+    <rect x="2" y="2" width="28" height="28" fill="#e0dac0" stroke="#bdbab0" stroke-width="4" stroke-linejoin="miter"/>
+    <!-- Inner content representing a book/document -->
+    <path d="M 9 8 H 23 M 9 14 H 23 M 9 20 H 18" stroke="#4a2c2a" stroke-width="2.5" stroke-linecap="square"/>
+</svg>

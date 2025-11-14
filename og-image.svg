@@ -1,0 +1,14 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1200" height="630" fill="#f5f5dc"/>
+
+    <!-- Use a foreignObject to embed HTML and use the VT323 font -->
+    <foreignObject x="50" y="50" width="1100" height="530">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'VT323', monospace; color: #4a2c2a; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <style>@import url('https://fonts.googleapis.com/css2?family=VT323&amp;display=swap');</style>
+            <h1 style="font-size: 96px; font-weight: bold; margin: 0;">The Guestbook</h1>
+            <p style="font-size: 36px; margin-top: 20px;">A digital monument to the hand-built web.</p>
+            <p style="font-size: 28px; margin-top: 60px; color: #6a3a3a;">guestbook.im</p>
+        </div>
+    </foreignObject>
+</svg>
