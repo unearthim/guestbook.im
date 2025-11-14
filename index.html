@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO Meta Tags -->
     <title>The Guestbook Monument</title>
     <meta name="description" content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.">
     
@@ -94,7 +95,7 @@
             display: block;
         }
 
-        /* --- STYLES COPIED FROM GUESTBOOK.HTML --- */
+        /* --- STYLES FOR GUESTBOOK --- */
 
         /* 90s-style outset/inset borders for a 3D feel */
         .retro-box {
@@ -182,7 +183,7 @@
             z-index: 100;
             font-size: 1rem;
         }
-        /* --- END OF COPIED STYLES --- */
+        /* --- END OF GUESTBOOK STYLES --- */
     </style>
 </head>
 <body class="p-8 sm:p-12 md:p-16">
@@ -278,7 +279,7 @@ service cloud.firestore {
                 <p class="text-2xl font-bold">That's it. Your monument is complete.</p>
             </div>
 
-            <!-- Page 4: Our Guestbook (NOW WITH MERGED CODE) -->
+            <!-- Page 4: Our Guestbook (MERGED CODE) -->
             <div id="page-guestbook" class="page-content">
                 <h1 class="text-4xl font-bold mb-6">Sign Our Guestbook</h1>
                 <p class="mb-4">This is a living example of the guestbook described in this monument. It's running the exact same code. Feel free to leave your mark!</p>
@@ -419,13 +420,14 @@ service cloud.firestore {
     -->
     <script type="module">
         // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // ** NOTE: Using 12.6.0 to match your other public file **
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
         import { 
             getAuth, 
             signInAnonymously, 
-            signInWithCustomToken, 
             onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { 
             getFirestore, 
             collection, 
@@ -434,12 +436,26 @@ service cloud.firestore {
             query, 
             serverTimestamp,
             setLogLevel
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // --- Global Variables (will be set in init) ---
         let db, auth, userId;
         let guestbookForm, nameInput, messageInput, entriesContainer, messageBox;
-        let GUESTBOOK_COLLECTION_PATH; // Will be set in init
+        
+        // --- FIXED: Hardcode config for public site ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAEU3QcCzu4ZmwJpHhogu1hMpyRp2swUz8",
+          authDomain: "jojo-4b593.firebaseapp.com",
+          projectId: "jojo-4b593",
+          storageBucket: "jojo-4b593.firebasestorage.app",
+          messagingSenderId: "353107431611",
+          appId: "1:353107431611:web:cdfbe88f704b137f44599e",
+          measurementId: "G-76MYKY7PWC"
+        };
+        
+        // --- FIXED: Set simple public collection path ---
+        const GUESTBOOK_COLLECTION_PATH = `guestbookEntries`;
+
 
         // --- Helper Functions ---
         
@@ -584,23 +600,15 @@ service cloud.firestore {
          * This function is now exposed on the window and called by the nav script.
          */
         window.initGuestbookApp = async function() {
-            // 1. READ ENV VARIABLES (NOW)
-            // These are provided by the Canvas environment
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfigJSON = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
             
-            // Set the dynamic collection path
-            GUESTBOOK_COLLECTION_PATH = `/artifacts/${appId}/public/data/guestbookEntries`;
-
-            // 2. Get references to all the UI elements
+            // 1. Get references to all the UI elements
             guestbookForm = document.getElementById('guestbook-form');
             nameInput = document.getElementById('name');
             messageInput = document.getElementById('message');
             entriesContainer = document.getElementById('entries-container');
             messageBox = document.getElementById('message-box');
 
-            // 3. Check if elements exist (in case of error)
+            // 2. Check if elements exist (in case of error)
             if (!guestbookForm || !entriesContainer || !messageBox) {
                 console.error("Guestbook HTML elements not found!");
                 if (entriesContainer) {
@@ -609,29 +617,24 @@ service cloud.firestore {
                 return;
             }
             
-            // 4. Check for Firebase config
-            let firebaseConfig;
-            try {
-                firebaseConfig = JSON.parse(firebaseConfigJSON);
-                if (Object.keys(firebaseConfig).length === 0) {
-                    throw new Error("Parsed config is empty.");
-                }
-            } catch (e) {
-                console.error("Failed to parse Firebase config:", e);
+            // 3. Check for Firebase config (it's hardcoded above)
+            if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing or invalid.");
                 entriesContainer.innerHTML = '<p class="text-center">Error: Firebase config is missing or invalid.</p>';
                 return;
             }
 
             try {
-                // 5. Initialize Firebase
+                // 4. Initialize Firebase
                 const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app); // Include analytics
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
                 // Enable debug logging for Firestore
                 setLogLevel('Debug');
 
-                // 6. Set up auth state listener
+                // 5. Set up auth state listener
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         // User is signed in
@@ -642,13 +645,10 @@ service cloud.firestore {
                     } else {
                         // User is signed out, attempt to sign in
                         try {
-                            if (initialAuthToken) {
-                                console.log("Signing in with custom token...");
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                console.log("Signing in anonymously...");
-                                await signInAnonymously(auth);
-                            }
+                            // --- FIXED: Only use anonymous sign-in ---
+                            console.log("Signing in anonymously...");
+                            await signInAnonymously(auth);
+                            
                         } catch (authError) {
                             console.error("Auth Error: ", authError);
                             showMessage("Error: Could not authenticate.");
@@ -656,7 +656,7 @@ service cloud.firestore {
                     }
                 });
 
-                // 7. Attach form submit listener
+                // 6. Attach form submit listener
                 guestbookForm.addEventListener('submit', addEntry);
 
             } catch (error) {
