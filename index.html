@@ -1,6 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "VisualArtwork",
+          "@id": "https://guestbook.im/#content",
+          "url": "https://guestbook.im",
+          "name": "The Guestbook",
+          "description": "A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.",
+          "artMedium": "Interactive Web Tutorial",
+          "artForm": "Digital Monument",
+          "inLanguage": "en-US",
+          "datePublished": "2024-12-01",
+          "publisher": { "@id": "https://unearth.im/#organization" },
+          "isPartOf": { "@id": "https://guestbook.im/#website" },
+          "author": [
+            { "@id": "https://josiest.com/#person" },
+            { "@id": "https://felixvelas.co/#person" }
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://guestbook.im/#website",
+          "url": "https://guestbook.im",
+          "name": "guestbook.im",
+          "publisher": { "@id": "https://unearth.im/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://unearth.im/#organization",
+          "name": "unearth.im",
+          "url": "https://unearth.im",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://unearth.im/favicon-32x32.png"
+          },
+          "foundingDate": "2024",
+          "sameAs": [
+            "https://twitter.com/unearthim",
+            "https://github.com/unearthim"
+          ]
+        },
+        {
+          "@type": "Person",
+          "@id": "https://josiest.com/#person",
+          "name": "Josie Jefferson",
+          "url": "https://josiest.com",
+          "jobTitle": "Digital Archaeologist & Trust Architect",
+          "affiliation": { "@id": "https://unearth.im/#organization" },
+          "sameAs": ["https://notjojo.im"]
+        },
+        {
+          "@type": "Person",
+          "@id": "https://felixvelas.co/#person",
+          "name": "Felix Velasco",
+          "url": "https://felixvelas.co",
+          "jobTitle": "Trust Architect & Digital Archaeologist",
+          "affiliation": { "@id": "https://unearth.im/#organization" },
+          "sameAs": ["https://www.linkedin.com/in/felix-velasco-b793015"]
+        }
+      ]
+    }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO Meta Tags -->
@@ -336,7 +401,9 @@ service cloud.firestore {
     
     <!-- Footer -->
     <footer class="text-center text-lg mt-8 text-[#6a3a3a]">
-        an artifact unearthed and preserved by <a href="https://unearth.im" class="content-link" target="_blank">unearth.im</a>
+        <small>
+            a <b><a href="https://sentientification.com" class="content-link" target="_blank" rel="noopener noreferrer">liminal mind meld</a></b> collaboration: digital monument by <b><a href="https://unearth.im" class="content-link" target="_blank" rel="noopener noreferrer">unearth.im</a></b> | <b><a href="https://archaeobytology.org" class="content-link" target="_blank" rel="noopener noreferrer">archive & anvil</a></b>
+        </small>
     </footer>
 
     <!-- Message box for errors/loading (from guestbook.html) -->
