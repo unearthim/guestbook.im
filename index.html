@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <script type="application/ld+json">
     {
@@ -10,7 +11,7 @@
           "@id": "https://guestbook.im/#content",
           "url": "https://guestbook.im",
           "name": "The Guestbook",
-          "description": "A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.",
+          "description": "A digital monument and tutorial for the old-school web guestbook, preserved by unearth heritage foundry | archive & anvil.",
           "artMedium": "Interactive Web Tutorial",
           "artForm": "Digital Monument",
           "inLanguage": "en-US",
@@ -32,7 +33,8 @@
         {
           "@type": "Organization",
           "@id": "https://unearth.im/#organization",
-          "name": "unearth.im",
+          "name": "Unearth Heritage Foundry",
+"alternateName": ["Unearth Foundry","Archive & Anvil","Unearth Anvil","Unearth Works","Cultural Infrastructure Foundry"],
           "url": "https://unearth.im",
           "logo": {
             "@type": "ImageObject",
@@ -70,11 +72,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO Meta Tags -->
     <title>The Guestbook</title>
-    <meta name="description" content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth.im.">
-    
+    <meta name="description"
+        content="A digital monument and tutorial for the old-school web guestbook, preserved by unearth heritage foundry | archive & anvil.">
+
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Load retro font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,15 +86,19 @@
     <style>
         body {
             font-family: 'VT323', monospace;
-            background-color: #f5f5dc; /* Parchment / Beige */
-            color: #4a2c2a; /* Dark brown */
-            font-size: 1.25rem; /* 20px */
+            background-color: #f5f5dc;
+            /* Parchment / Beige */
+            color: #4a2c2a;
+            /* Dark brown */
+            font-size: 1.25rem;
+            /* 20px */
             line-height: 1.6;
         }
 
         .site-container {
             display: flex;
-            flex-direction: column; /* Mobile-first (stacked) */
+            flex-direction: column;
+            /* Mobile-first (stacked) */
             border: 4px outset #bdbab0;
             background-color: #e0dac0;
         }
@@ -107,22 +114,29 @@
         }
 
         /* Responsive layout for desktop */
-        @media (min-width: 768px) { /* md breakpoint */
+        @media (min-width: 768px) {
+
+            /* md breakpoint */
             .site-container {
-                flex-direction: row; /* Sidebar on left, content on right */
+                flex-direction: row;
+                /* Sidebar on left, content on right */
             }
+
             .sidebar {
                 border-right: 4px outset #bdbab0;
                 border-bottom: none;
                 width: 300px;
                 min-width: 300px;
             }
+
             .content-pane {
-                height: 80vh; /* Set a height for scrolling */
-                overflow-y: auto; /* Enable scrolling for content */
+                height: 80vh;
+                /* Set a height for scrolling */
+                overflow-y: auto;
+                /* Enable scrolling for content */
             }
         }
-        
+
         a.nav-link {
             display: block;
             padding: 0.5rem 1rem;
@@ -131,21 +145,22 @@
             border: 3px outset transparent;
             text-decoration: none;
         }
-        
+
         a.nav-link:hover {
             background-color: #c0bca5;
         }
-        
+
         a.nav-link.active {
             border-style: inset;
             background-color: #b0ad9a;
             font-weight: bold;
         }
-        
+
         a.content-link {
             color: #a05a2f;
             text-decoration: underline;
         }
+
         a.content-link:hover {
             color: #6a3a3a;
         }
@@ -154,7 +169,7 @@
         .page-content {
             display: none;
         }
-        
+
         /* Show the active page */
         .page-content.active {
             display: block;
@@ -164,15 +179,17 @@
 
         /* 90s-style outset/inset borders for a 3D feel */
         .retro-box {
-            background-color: #e0dac0; /* A slightly darker beige */
+            background-color: #e0dac0;
+            /* A slightly darker beige */
             border: 4px outset #bdbab0;
             border-radius: 0;
             padding: 1.5rem;
         }
-        
+
         /* Use a slightly different bg for the one inside the content pane */
         .content-pane .retro-box {
-             background-color: #f0ebe0; /* Lighter beige */
+            background-color: #f0ebe0;
+            /* Lighter beige */
         }
 
         .retro-input,
@@ -185,7 +202,7 @@
             width: 100%;
             color: #333;
         }
-        
+
         .retro-input:focus,
         .retro-textarea:focus {
             outline: 2px solid #4a2c2a;
@@ -200,43 +217,48 @@
             color: #4a2c2a;
             font-size: 1.125rem;
         }
-        
+
         .retro-button:active {
             border-style: inset;
             background-color: #b0ad9a;
         }
-        
+
         /* Dashed divider for entries */
         .entry {
-            border-bottom: 2px dashed #a05a2f; /* A coppery brown */
+            border-bottom: 2px dashed #a05a2f;
+            /* A coppery brown */
             padding-bottom: 1rem;
             margin-bottom: 1rem;
         }
-        
+
         .entry-header {
             font-weight: bold;
             font-size: 1.25rem;
-            color: #6a3a3a; /* Darker red-brown */
+            color: #6a3a3a;
+            /* Darker red-brown */
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
         }
-        
+
         .entry-timestamp {
             font-size: 0.9rem;
             font-weight: normal;
             color: #5e5e5e;
         }
-        
+
         .entry-message {
             margin-top: 0.5rem;
-            white-space: pre-wrap; /* Preserves line breaks from textarea */
-            word-wrap: break-word; /* Prevents long words from overflowing */
+            white-space: pre-wrap;
+            /* Preserves line breaks from textarea */
+            word-wrap: break-word;
+            /* Prevents long words from overflowing */
         }
 
         /* Loading/Error Message Box */
         #message-box {
-            display: none; /* Hidden by default */
+            display: none;
+            /* Hidden by default */
             position: fixed;
             top: 1rem;
             left: 50%;
@@ -248,14 +270,16 @@
             z-index: 100;
             font-size: 1rem;
         }
+
         /* --- END OF GUESTBOOK STYLES --- */
     </style>
 </head>
+
 <body class="p-8 sm:p-12 md:p-16">
 
     <!-- This is the main 90s-style "window" -->
     <div class="site-container max-w-6xl mx-auto">
-        
+
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <h2 class="text-3xl font-bold mb-4 p-2">The Monument</h2>
@@ -265,14 +289,15 @@
             <a href="#guestbook" class="nav-link" data-page="guestbook">Our Guestbook</a>
             <a href="#about" class="nav-link" data-page="about">About This Project</a>
         </nav>
-        
+
         <!-- Main Content Area -->
         <main class="content-pane">
-            
+
             <!-- Page 1: Home -->
             <div id="page-home" class="page-content active">
                 <h1 class="text-5xl font-bold mb-6">Welcome.</h1>
-                <p class="mb-4">You've found a living monument to the "hand-built" web. This site is a celebration and a functional tutorial for one of the web's first social features: the <strong>guestbook</strong>.</p>
+                <p class="mb-4">You've found a living monument to the "hand-built" web. This site is a celebration and a
+                    functional tutorial for one of the web's first social features: the <strong>guestbook</strong>.</p>
                 <div class="p-4 retro-box" style="background-color: #fafaeb; border-style: inset; border-width: 2px;">
                     <h2 class="text-3xl font-bold mb-3">What is this?</h2>
                     <ul class="list-disc list-inside space-y-2">
@@ -287,45 +312,68 @@
                     </p>
                 </div>
             </div>
-            
+
             <!-- Page 2: What is a Guestbook? -->
             <div id="page-what-is" class="page-content">
                 <h1 class="text-4xl font-bold mb-6">What is a Guestbook?</h1>
                 <h2 class="text-3xl font-bold mb-4">Part 1: The Philosophy</h2>
-                <p class="mb-4">Remember guestbooks? Before "likes," "feeds," or "followers," there was the humble guestbook. It was the digital equivalent of a welcome mat and a handwritten log on the table of a bed-and-breakfast.</p>
-                <p class="mb-4">It was a simple, chronological wall of "I was here," a quiet, asynchronous conversation between a creator and their visitors.</p>
-                <p class="mb-4">Guestbooks were the original social media, but without the noise. They were about <strong>connection</strong>, not content. They were a landmark of the early, "hand-built" web, where every homepage was a digital home.</p>
-                <p class="mb-4">This project is a <strong>Digital Monument</strong> to that idea. We are unearthing that simple, powerful connection and showing how its spirit can live on with modern, accessible tools.</p>
+                <p class="mb-4">Remember guestbooks? Before "likes," "feeds," or "followers," there was the humble
+                    guestbook. It was the digital equivalent of a welcome mat and a handwritten log on the table of a
+                    bed-and-breakfast.</p>
+                <p class="mb-4">It was a simple, chronological wall of "I was here," a quiet, asynchronous conversation
+                    between a creator and their visitors.</p>
+                <p class="mb-4">Guestbooks were the original social media, but without the noise. They were about
+                    <strong>connection</strong>, not content. They were a landmark of the early, "hand-built" web, where
+                    every homepage was a digital home.</p>
+                <p class="mb-4">This project is a <strong>Digital Monument</strong> to that idea. We are unearthing that
+                    simple, powerful connection and showing how its spirit can live on with modern, accessible tools.
+                </p>
             </div>
 
             <!-- Page 3: Create Your Own -->
             <div id="page-how-to" class="page-content">
                 <h1 class="text-4xl font-bold mb-6">Create Your Own</h1>
-                <p class="mb-4">A monument needs a strong foundation. Ours stands on three pillars: The HTML, The Firebase Project, and The Security Rules.</p>
+                <p class="mb-4">A monument needs a strong foundation. Ours stands on three pillars: The HTML, The
+                    Firebase Project, and The Security Rules.</p>
                 <hr class="border-2 border-dashed border-[#a05a2f] my-6">
 
                 <h2 class="text-3xl font-bold mb-4">Pillar 1: The HTML</h2>
-                <p class="mb-4">This is the complete, self-contained HTML file. It's everything your visitors will see. Copy all the code from the <a href="guestbook-template.html" class="content-link" target="_blank">guestbook-template.html</a> file and save it as `index.html` on your computer.</p>
+                <p class="mb-4">This is the complete, self-contained HTML file. It's everything your visitors will see.
+                    Copy all the code from the <a href="guestbook-template.html" class="content-link"
+                        target="_blank">guestbook-template.html</a> file and save it as `index.html` on your computer.
+                </p>
 
                 <h2 class="text-3xl font-bold mb-4 mt-6">Pillar 2: The "Engine"</h2>
-                <p class="mb-4">Our guestbook needs a place to store its entries. We'll use Firebase Firestore, a free, real-time database from Google.</p>
+                <p class="mb-4">Our guestbook needs a place to store its entries. We'll use Firebase Firestore, a free,
+                    real-time database from Google.</p>
                 <ol class="list-decimal list-inside space-y-2 mb-4">
-                    <li><strong>Go to Firebase:</strong> Go to <a href="https://firebase.google.com/" class="content-link" target="_blank">firebase.google.com</a> and sign in.</li>
-                    <li><strong>Create a Project:</strong> Click "Go to console" and "Add project." Give it a name (e.g., "My-Guestbook").</li>
-                    <li><strong>Add a Web App:</strong> Inside your project, click the Web icon (<code>&lt;/&gt;</code>). Give it a nickname and click "Register app."</li>
-                    <li><strong>Get Your Keys:</strong> Firebase will show you a JavaScript object called <code>firebaseConfig</code>. This is your key.</li>
-                    <li><strong>Connect Your HTML:</strong> Copy this <em>entire</em> <code>firebaseConfig</code> object. Open your <code>index.html</code> file (from Pillar 1) and paste it directly into the <code>&lt;script&gt;</code> tag at the bottom, replacing the placeholder.</li>
+                    <li><strong>Go to Firebase:</strong> Go to <a href="https://firebase.google.com/"
+                            class="content-link" target="_blank">firebase.google.com</a> and sign in.</li>
+                    <li><strong>Create a Project:</strong> Click "Go to console" and "Add project." Give it a name
+                        (e.g., "My-Guestbook").</li>
+                    <li><strong>Add a Web App:</strong> Inside your project, click the Web icon
+                        (<code>&lt;/&gt;</code>). Give it a nickname and click "Register app."</li>
+                    <li><strong>Get Your Keys:</strong> Firebase will show you a JavaScript object called
+                        <code>firebaseConfig</code>. This is your key.</li>
+                    <li><strong>Connect Your HTML:</strong> Copy this <em>entire</em> <code>firebaseConfig</code>
+                        object. Open your <code>index.html</code> file (from Pillar 1) and paste it directly into the
+                        <code>&lt;script&gt;</code> tag at the bottom, replacing the placeholder.</li>
                 </ol>
 
                 <h2 class="text-3xl font-bold mb-4 mt-6">Pillar 3: The "Rules"</h2>
-                <p class="mb-4">This is the most important step. By default, your new database is locked down. We need to create a "bouncer" that only lets our guestbook read and write.</p>
+                <p class="mb-4">This is the most important step. By default, your new database is locked down. We need
+                    to create a "bouncer" that only lets our guestbook read and write.</p>
                 <ol class="list-decimal list-inside space-y-2 mb-4">
-                    <li><strong>Go to Firestore:</strong> In your Firebase project, go to <strong>Build</strong> &gt; <strong>Firestore Database</strong>.</li>
-                    <li><strong>Create Database:</strong> Click "Create database." Start in <strong>Test mode</strong>. This gives you 30 days before it locks down.</li>
-                    <li><strong>Write Your Rules:</strong> After your database is made, click the <strong>Rules</strong> tab.</li>
+                    <li><strong>Go to Firestore:</strong> In your Firebase project, go to <strong>Build</strong> &gt;
+                        <strong>Firestore Database</strong>.</li>
+                    <li><strong>Create Database:</strong> Click "Create database." Start in <strong>Test mode</strong>.
+                        This gives you 30 days before it locks down.</li>
+                    <li><strong>Write Your Rules:</strong> After your database is made, click the <strong>Rules</strong>
+                        tab.</li>
                     <li>Delete <em>everything</em> in the editor and paste in these rules:</li>
                 </ol>
-                <pre class="retro-box p-4 text-sm" style="background-color: #fafaeb; border-style: inset; border-width: 2px; overflow-x: auto;">
+                <pre class="retro-box p-4 text-sm"
+                    style="background-color: #fafaeb; border-style: inset; border-width: 2px; overflow-x: auto;">
 rules_version = '2';
 
 service cloud.firestore {
@@ -347,36 +395,37 @@ service cloud.firestore {
             <!-- Page 4: Our Guestbook (MERGED CODE) -->
             <div id="page-guestbook" class="page-content">
                 <h1 class="text-4xl font-bold mb-6">Sign Our Guestbook</h1>
-                <p class="mb-4">This is a living example of the guestbook described in this monument. It's running the exact same code. Feel free to leave your mark!</p>
-                
+                <p class="mb-4">This is a living example of the guestbook described in this monument. It's running the
+                    exact same code. Feel free to leave your mark!</p>
+
                 <!-- HTML from guestbook.html, pasted directly -->
                 <div class="retro-box">
                     <h1 class="text-4xl font-bold text-center mb-6 text-shadow">
                         ~~ Ye Olde Guestbook ~~
                     </h1>
-            
+
                     <!-- Form for new entries -->
                     <form id="guestbook-form" class="mb-8">
                         <div class="mb-4">
                             <label for="name" class="block mb-2 text-lg">Your Name:</label>
                             <input type="text" id="name" class="retro-input" required maxlength="50">
                         </div>
-                        
+
                         <div class="mb-4">
                             <label for="message" class="block mb-2 text-lg">Your Message:</label>
                             <textarea id="message" rows="4" class="retro-textarea" required maxlength="500"></textarea>
                         </div>
-                        
+
                         <div class="text-center">
                             <button type="submit" class="retro-button">
                                 Sign the Book!
                             </button>
                         </div>
                     </form>
-                    
+
                     <!-- Divider -->
                     <hr class="border-2 border-dashed border-[#a05a2f] my-8">
-                    
+
                     <!-- Display area for entries -->
                     <h2 class="text-3xl font-bold text-center mb-6">What Folks Have Said:</h2>
                     <div id="entries-container">
@@ -389,20 +438,27 @@ service cloud.firestore {
             <!-- Page 5: About This Project -->
             <div id="page-about" class="page-content">
                 <h1 class="text-4xl font-bold mb-6">About This Monument</h1>
-                <p class="mb-4">This project is a "Digital Monument," a "proof-of-work" concept from the <a href="https://unearth.im" class="content-link" target="_blank">unearth.im</a> foundry.</p>
-                <p class="mb-4">The goal is to unearth the stories and philosophies of the "hand-built" web—not just to remember them, but to make them functional and accessible for a new generation.</p>
-                <p class="mb-4">The guestbook represents a time when the web was a collection of digital homes, and discovery was an act of personal connection. By preserving this tool, we preserve that story.</p>
+                <p class="mb-4">This project is a "Digital Monument," a "proof-of-work" concept from the <a
+                        href="https://unearth.im" class="content-link" target="_blank">unearth.im</a> foundry.</p>
+                <p class="mb-4">The goal is to unearth the stories and philosophies of the "hand-built" web—not just to
+                    remember them, but to make them functional and accessible for a new generation.</p>
+                <p class="mb-4">The guestbook represents a time when the web was a collection of digital homes, and
+                    discovery was an act of personal connection. By preserving this tool, we preserve that story.</p>
                 <p class="mb-4">It is, in short, <strong>story, grounded.</strong></p>
             </div>
-            
+
         </main>
-        
+
     </div>
-    
+
     <!-- Footer -->
     <footer class="text-center text-lg mt-8 text-[#6a3a3a]">
         <small>
-            a <b><a href="https://sentientification.com" class="content-link" target="_blank" rel="noopener noreferrer">liminal mind meld</a></b> collaboration: digital monument by <b><a href="https://unearth.im" class="content-link" target="_blank" rel="noopener noreferrer">unearth.im</a></b> | <b><a href="https://archaeobytology.org" class="content-link" target="_blank" rel="noopener noreferrer">archive & anvil</a></b>
+            a <b><a href="https://sentientification.com" class="content-link" target="_blank"
+                    rel="noopener noreferrer">liminal mind meld</a></b> collaboration: digital monument by <b><a
+                    href="https://unearth.im" class="content-link" target="_blank"
+                    rel="noopener noreferrer">unearth.im</a></b> | <b><a href="https://archaeobytology.org"
+                    class="content-link" target="_blank" rel="noopener noreferrer">archive & anvil</a></b>
         </small>
     </footer>
 
@@ -425,13 +481,13 @@ service cloud.firestore {
                 pages.forEach(page => {
                     page.classList.remove('active');
                 });
-                
+
                 // Show the target page
                 const targetPage = document.getElementById(`page-${pageId}`);
                 if (targetPage) {
                     targetPage.classList.add('active');
                 }
-                
+
                 // Update active state for nav links
                 navLinks.forEach(link => {
                     if (link.dataset.page === pageId) {
@@ -440,9 +496,9 @@ service cloud.firestore {
                         link.classList.remove('active');
                     }
                 });
-                
+
                 // Scroll content to top
-                if(contentPane) {
+                if (contentPane) {
                     contentPane.scrollTop = 0;
                 }
 
@@ -490,17 +546,17 @@ service cloud.firestore {
         // ** NOTE: Using 12.6.0 to match your other public file **
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            onAuthStateChanged 
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            onSnapshot, 
-            query, 
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            onSnapshot,
+            query,
             serverTimestamp,
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -508,24 +564,24 @@ service cloud.firestore {
         // --- Global Variables (will be set in init) ---
         let db, auth, userId;
         let guestbookForm, nameInput, messageInput, entriesContainer, messageBox;
-        
+
         // --- FIXED: Hardcode config for public site ---
         const firebaseConfig = {
-          apiKey: "AIzaSyAEU3QcCzu4ZmwJpHhogu1hMpyRp2swUz8",
-          authDomain: "jojo-4b593.firebaseapp.com",
-          projectId: "jojo-4b593",
-          storageBucket: "jojo-4b593.firebasestorage.app",
-          messagingSenderId: "353107431611",
-          appId: "1:353107431611:web:cdfbe88f704b137f44599e",
-          measurementId: "G-76MYKY7PWC"
+            apiKey: "AIzaSyAEU3QcCzu4ZmwJpHhogu1hMpyRp2swUz8",
+            authDomain: "jojo-4b593.firebaseapp.com",
+            projectId: "jojo-4b593",
+            storageBucket: "jojo-4b593.firebasestorage.app",
+            messagingSenderId: "353107431611",
+            appId: "1:353107431611:web:cdfbe88f704b137f44599e",
+            measurementId: "G-76MYKY7PWC"
         };
-        
+
         // --- FIXED: Set simple public collection path ---
         const GUESTBOOK_COLLECTION_PATH = `guestbookEntries`;
 
 
         // --- Helper Functions ---
-        
+
         /**
          * Shows a message in the message box.
          * @param {string} text - The message to display.
@@ -560,7 +616,7 @@ service cloud.firestore {
          */
         async function addEntry(e) {
             e.preventDefault(); // Prevent default form submission
-            
+
             if (!db || !userId) {
                 showMessage("Not connected to database. Please wait.");
                 return;
@@ -582,7 +638,7 @@ service cloud.firestore {
                     timestamp: serverTimestamp(),
                     ownerId: userId // Store who made the post
                 });
-                
+
                 // Clear the form
                 nameInput.value = '';
                 messageInput.value = '';
@@ -604,11 +660,11 @@ service cloud.firestore {
             }
 
             const q = query(collection(db, GUESTBOOK_COLLECTION_PATH));
-            
+
             onSnapshot(q, (querySnapshot) => {
                 if (!entriesContainer) return; // Guard clause
                 entriesContainer.innerHTML = ''; // Clear current entries
-                
+
                 if (querySnapshot.empty) {
                     entriesContainer.innerHTML = '<p class="text-center">Be the first to sign!</p>';
                     return;
@@ -616,7 +672,7 @@ service cloud.firestore {
 
                 // Get docs and sort them client-side by timestamp (newest first)
                 const entries = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
+
                 // Sort by timestamp, handling potential nulls
                 entries.sort((a, b) => {
                     const timeA = a.timestamp ? a.timestamp.seconds : 0;
@@ -631,31 +687,31 @@ service cloud.firestore {
 
                     const headerDiv = document.createElement('div');
                     headerDiv.className = 'entry-header';
-                    
+
                     const nameSpan = document.createElement('span');
                     nameSpan.textContent = entry.name;
-                    
+
                     const timeSpan = document.createElement('span');
                     timeSpan.className = 'entry-timestamp';
                     timeSpan.textContent = formatTimestamp(entry.timestamp);
-                    
+
                     headerDiv.appendChild(nameSpan);
                     headerDiv.appendChild(timeSpan);
 
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'entry-message';
                     // Use textContent to prevent HTML injection
-                    messageDiv.textContent = entry.message; 
-                    
+                    messageDiv.textContent = entry.message;
+
                     entryDiv.appendChild(headerDiv);
                     entryDiv.appendChild(messageDiv);
-                    
+
                     entriesContainer.appendChild(entryDiv);
                 });
 
             }, (error) => {
                 console.error("Error loading guestbook: ", error);
-                if(entriesContainer) {
+                if (entriesContainer) {
                     entriesContainer.innerHTML = '<p class="text-center">Error loading entries. Check console.</p>';
                 }
                 showMessage("Error loading guestbook.");
@@ -666,8 +722,8 @@ service cloud.firestore {
          * Initializes the Firebase app and sets up auth/listeners.
          * This function is now exposed on the window and called by the nav script.
          */
-        window.initGuestbookApp = async function() {
-            
+        window.initGuestbookApp = async function () {
+
             // 1. Get references to all the UI elements
             guestbookForm = document.getElementById('guestbook-form');
             nameInput = document.getElementById('name');
@@ -683,7 +739,7 @@ service cloud.firestore {
                 }
                 return;
             }
-            
+
             // 3. Check for Firebase config (it's hardcoded above)
             if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
                 console.error("Firebase config is missing or invalid.");
@@ -697,7 +753,7 @@ service cloud.firestore {
                 const analytics = getAnalytics(app); // Include analytics
                 db = getFirestore(app);
                 auth = getAuth(app);
-                
+
                 // Enable debug logging for Firestore
                 setLogLevel('Debug');
 
@@ -715,7 +771,7 @@ service cloud.firestore {
                             // --- FIXED: Only use anonymous sign-in ---
                             console.log("Signing in anonymously...");
                             await signInAnonymously(auth);
-                            
+
                         } catch (authError) {
                             console.error("Auth Error: ", authError);
                             showMessage("Error: Could not authenticate.");
@@ -734,4 +790,5 @@ service cloud.firestore {
     </script>
 
 </body>
+
 </html>
